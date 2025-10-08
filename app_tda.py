@@ -4,17 +4,28 @@ import datetime
 import os
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Constantes e arquivos
 # -----------------------------------------------------------------------------
+=======
+# Funções utilitárias para leitura e gravação de dados
+# -----------------------------------------------------------------------------
+
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 TASKS_FILE = "tasks.csv"
 FINANCE_FILE = "finance.csv"
 NOTES_FILE = "notes.txt"
 POINTS_PER_TASK = 10
 
+<<<<<<< HEAD
+=======
+# categorias padrão para tarefas e finanças
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 DEFAULT_TASK_CATEGORIES = ["Trabalho", "Pessoal", "Finanças", "Saúde", "Estudos", "Outro"]
 DEFAULT_FINANCE_CATEGORIES = ["Moradia", "Alimentação", "Saúde", "Transporte", "Lazer", "Educação", "Outros"]
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Util: carregar e salvar Tarefas
 # -----------------------------------------------------------------------------
 def load_tasks():
@@ -56,14 +67,59 @@ def save_finance(df: pd.DataFrame):
 # -----------------------------------------------------------------------------
 # Util: carregar e salvar Notas
 # -----------------------------------------------------------------------------
+=======
+# Carregar e salvar tarefas
+# -----------------------------------------------------------------------------
+
+def load_tasks():
+    if os.path.exists(TASKS_FILE):
+        df = pd.read_csv(TASKS_FILE)
+        # Convert date columns to datetime
+        if not df.empty:
+            df["due_date"] = pd.to_datetime(df["due_date"])
+        return df
+    else:
+        return pd.DataFrame(columns=["id", "description", "category", "priority", "due_date", "completed", "points"])
+
+def save_tasks(df):
+    df.to_csv(TASKS_FILE, index=False)
+
+# -----------------------------------------------------------------------------
+# Carregar e salvar transações financeiras
+# -----------------------------------------------------------------------------
+
+def load_finance():
+    if os.path.exists(FINANCE_FILE):
+        df = pd.read_csv(FINANCE_FILE)
+        if not df.empty:
+            df["date"] = pd.to_datetime(df["date"])
+        return df
+    else:
+        return pd.DataFrame(columns=["date", "type", "category", "description", "amount"])
+
+def save_finance(df):
+    df.to_csv(FINANCE_FILE, index=False)
+
+# -----------------------------------------------------------------------------
+# Carregar e salvar notas
+# -----------------------------------------------------------------------------
+
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 def load_notes():
     notes = []
     if os.path.exists(NOTES_FILE):
         with open(NOTES_FILE, "r", encoding="utf-8") as f:
+<<<<<<< HEAD
             for line in f:
                 if "|" in line:
                     timestamp, content = line.split("|", 1)
                     notes.append({"timestamp": timestamp.strip(), "content": content.strip()})
+=======
+            lines = f.readlines()
+            for line in lines:
+                timestamp, content = line.split("|", 1)
+                notes.append({"timestamp": timestamp.strip(), "content": content.strip()})
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
     return notes
 
 def save_note(content: str):
@@ -72,12 +128,19 @@ def save_note(content: str):
         f.write(f"{timestamp}|{content}\n")
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Página: Tarefas
 # -----------------------------------------------------------------------------
+=======
+# Página de tarefas
+# -----------------------------------------------------------------------------
+
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 def page_tasks():
     st.header("🗂️ Lista de Tarefas")
     tasks_df = load_tasks()
 
+<<<<<<< HEAD
     total_points = tasks_df.loc[tasks_df["completed"] == True, "points"].sum() if not tasks_df.empty else 0
     st.metric("Pontos acumulados", int(total_points))
 
@@ -90,6 +153,19 @@ def page_tasks():
                 overdue = False
             return ["background-color: #ffe6e6" if overdue else ""] * len(row)
 
+=======
+    # mostrar pontos acumulados
+    total_points = tasks_df.loc[tasks_df["completed"] == True, "points"].sum()
+    st.metric("Pontos acumulados", int(total_points))
+
+    # mostrar tabela de tarefas
+    if not tasks_df.empty:
+        # aplicar cor vermelha para tarefas atrasadas
+        def highlight_row(row):
+            if not row["completed"] and row["due_date"] < pd.Timestamp.now():
+                return ["background-color: #ffe6e6"] * len(row)
+            return [""] * len(row)
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         st.dataframe(
             tasks_df.style.apply(highlight_row, axis=1),
             height=300,
@@ -98,7 +174,11 @@ def page_tasks():
     else:
         st.info("Nenhuma tarefa registrada.")
 
+<<<<<<< HEAD
     # Formulário: adicionar tarefa
+=======
+    # Formulário para adicionar nova tarefa
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
     with st.form("add_task"):
         st.subheader("Adicionar nova tarefa")
         description = st.text_input("Descrição")
@@ -106,6 +186,7 @@ def page_tasks():
         priority = st.selectbox("Prioridade", ["Baixa", "Média", "Alta"])
         due_date = st.date_input("Data de vencimento", datetime.date.today())
         submitted = st.form_submit_button("Adicionar")
+<<<<<<< HEAD
 
         if submitted:
             if description.strip():
@@ -113,19 +194,32 @@ def page_tasks():
                 new_row = {
                     "id": new_id,
                     "description": description.strip(),
+=======
+        if submitted:
+            if description:
+                new_id = tasks_df["id"].max() + 1 if not tasks_df.empty else 1
+                new_row = {
+                    "id": new_id,
+                    "description": description,
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
                     "category": category,
                     "priority": priority,
                     "due_date": pd.Timestamp(due_date),
                     "completed": False,
                     "points": POINTS_PER_TASK,
                 }
+<<<<<<< HEAD
                 new_row_df = pd.DataFrame([new_row])
                 tasks_df = pd.concat([tasks_df, new_row_df], ignore_index=True)
+=======
+                tasks_df = tasks_df.append(new_row, ignore_index=True)
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
                 save_tasks(tasks_df)
                 st.success("Tarefa adicionada com sucesso!")
             else:
                 st.error("A descrição não pode ficar vazia.")
 
+<<<<<<< HEAD
     # Concluir tarefa
     st.subheader("Concluir tarefas")
     if not tasks_df.empty:
@@ -137,12 +231,33 @@ def page_tasks():
                 tasks_df.at[idx, "completed"] = True
                 save_tasks(tasks_df)
                 st.success(f"Tarefa '{choice}' marcada como concluída!")
+=======
+    # marcar tarefa como concluída
+    st.subheader("Concluir tarefas")
+    if not tasks_df.empty:
+        incomplete_tasks = tasks_df[tasks_df["completed"] == False]
+        if not incomplete_tasks.empty:
+            task_to_complete = st.selectbox(
+                "Selecione a tarefa a concluir", incomplete_tasks["description"].tolist()
+            )
+            if st.button("Marcar como concluída"):
+                idx = tasks_df[tasks_df["description"] == task_to_complete].index[0]
+                tasks_df.at[idx, "completed"] = True
+                save_tasks(tasks_df)
+                st.success(f"Tarefa '{task_to_complete}' marcada como concluída!")
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         else:
             st.info("Não há tarefas pendentes.")
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Página: Pomodoro
 # -----------------------------------------------------------------------------
+=======
+# Página do cronômetro Pomodoro
+# -----------------------------------------------------------------------------
+
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 def page_pomodoro():
     st.header("⏱️ Timer Pomodoro")
     work_minutes = st.number_input("Minutos de trabalho (Pomodoro)", min_value=1, max_value=60, value=25)
@@ -153,21 +268,40 @@ def page_pomodoro():
         st.session_state.start_time = None
         st.session_state.work_duration = None
         st.session_state.break_duration = None
+<<<<<<< HEAD
         st.session_state.phase = "work"  # "work" ou "break"
 
     if st.button("Iniciar/Pausar"):
         if not st.session_state.pomodoro_started:
+=======
+        st.session_state.phase = "work"  # work ou break
+
+    if st.button("Iniciar/Pausar"):
+        if not st.session_state.pomodoro_started:
+            # iniciar
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
             st.session_state.pomodoro_started = True
             st.session_state.start_time = datetime.datetime.now()
             st.session_state.work_duration = datetime.timedelta(minutes=work_minutes)
             st.session_state.break_duration = datetime.timedelta(minutes=break_minutes)
             st.session_state.phase = "work"
         else:
+<<<<<<< HEAD
             st.session_state.pomodoro_started = False
 
     if st.session_state.pomodoro_started:
         now = datetime.datetime.now()
         elapsed = now - st.session_state.start_time
+=======
+            # pausar
+            st.session_state.pomodoro_started = False
+
+    # exibir tempo restante
+    if st.session_state.pomodoro_started:
+        now = datetime.datetime.now()
+        elapsed = now - st.session_state.start_time
+        # definir duração da fase atual
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         if st.session_state.phase == "work":
             remaining = st.session_state.work_duration - elapsed
             if remaining.total_seconds() <= 0:
@@ -180,31 +314,54 @@ def page_pomodoro():
                 st.session_state.phase = "work"
                 st.session_state.start_time = now
                 remaining = st.session_state.work_duration
+<<<<<<< HEAD
         minutes, seconds = divmod(max(0, int(remaining.total_seconds())), 60)
         st.write(f"Fase atual: {'Trabalho' if st.session_state.phase == 'work' else 'Pausa'}")
         st.subheader(f"Tempo restante: {minutes:02d}:{seconds:02d}")
 
+=======
+        minutes, seconds = divmod(int(remaining.total_seconds()), 60)
+        st.write(f"Fase atual: {'Trabalho' if st.session_state.phase == 'work' else 'Pausa'}")
+        st.subheader(f"Tempo restante: {minutes:02d}:{seconds:02d}")
+        # exibir progresso
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         total_seconds = (
             st.session_state.work_duration.total_seconds()
             if st.session_state.phase == "work"
             else st.session_state.break_duration.total_seconds()
         )
+<<<<<<< HEAD
         progress_fraction = 1 - (max(0.0, remaining.total_seconds()) / total_seconds)
         st.progress(min(1.0, max(0.0, progress_fraction)))
 
         # Atualiza a cada ~1s (pode causar refresh frequente)
+=======
+        progress_fraction = max(0.0, remaining.total_seconds() / total_seconds)
+        st.progress(1 - progress_fraction)
+        # auto-refresh a cada segundo
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         st.experimental_rerun()
     else:
         st.info("Pressione iniciar para começar o Pomodoro.")
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Página: Finanças
 # -----------------------------------------------------------------------------
+=======
+# Página de finanças
+# -----------------------------------------------------------------------------
+
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 def page_finances():
     st.header("💰 Finanças Pessoais")
     finance_df = load_finance()
 
+<<<<<<< HEAD
     # Resumo
+=======
+    # mostrar resumo
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
     if not finance_df.empty:
         total_income = finance_df[finance_df["type"] == "Receita"]["amount"].sum()
         total_expense = finance_df[finance_df["type"] == "Despesa"]["amount"].sum()
@@ -212,10 +369,18 @@ def page_finances():
         col1, col2, col3 = st.columns(3)
         col1.metric("Total de receitas", f"R$ {total_income:,.2f}")
         col2.metric("Total de despesas", f"R$ {total_expense:,.2f}")
+<<<<<<< HEAD
         col3.metric("Saldo", f"R$ {saldo:,.2f}")
         st.dataframe(finance_df, height=300, use_container_width=True)
 
         # Gráfico de despesas por categoria
+=======
+        col3.metric("Saldo", f"R$ {saldo:,.2f}", delta=None)
+
+        st.dataframe(finance_df, height=300, use_container_width=True)
+
+        # gráfico de despesas por categoria
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         expenses = finance_df[finance_df["type"] == "Despesa"]
         if not expenses.empty:
             exp_cat = expenses.groupby("category")["amount"].sum()
@@ -224,7 +389,11 @@ def page_finances():
     else:
         st.info("Nenhuma transação registrada.")
 
+<<<<<<< HEAD
     # Formulário: adicionar transação
+=======
+    # Formulário para adicionar transação
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
     with st.form("add_transaction"):
         st.subheader("Registrar transação")
         trans_type = st.selectbox("Tipo", ["Receita", "Despesa"])
@@ -233,30 +402,50 @@ def page_finances():
         amount = st.number_input("Valor (R$)", min_value=0.0, format="%.2f")
         date = st.date_input("Data", datetime.date.today())
         submitted = st.form_submit_button("Adicionar")
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
         if submitted:
             if amount > 0:
                 new_row = {
                     "date": pd.Timestamp(date),
                     "type": trans_type,
                     "category": category,
+<<<<<<< HEAD
                     "description": description.strip(),
                     "amount": float(amount),
                 }
                 new_row_df = pd.DataFrame([new_row])
                 finance_df = pd.concat([finance_df, new_row_df], ignore_index=True)
+=======
+                    "description": description,
+                    "amount": amount,
+                }
+                finance_df = finance_df.append(new_row, ignore_index=True)
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
                 save_finance(finance_df)
                 st.success("Transação registrada com sucesso!")
             else:
                 st.error("O valor deve ser maior que zero.")
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Página: Anotações
 # -----------------------------------------------------------------------------
+=======
+# Página de anotações
+# -----------------------------------------------------------------------------
+
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 def page_notes():
     st.header("📝 Anotações")
     notes = load_notes()
 
+<<<<<<< HEAD
+=======
+    # adicionar nova anotação
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
     with st.form("add_note"):
         st.subheader("Nova anotação")
         content = st.text_area("Escreva sua anotação aqui")
@@ -268,17 +457,27 @@ def page_notes():
             else:
                 st.error("A anotação não pode ficar vazia.")
 
+<<<<<<< HEAD
     st.subheader("Anotações salvas")
     query = st.text_input("Pesquisar", "")
     filtered = [n for n in notes if query.lower() in n["content"].lower()]
     if filtered:
         for note in filtered:
+=======
+    # busca nas anotações
+    st.subheader("Anotações salvas")
+    query = st.text_input("Pesquisar", "")
+    filtered_notes = [n for n in notes if query.lower() in n["content"].lower()]
+    if filtered_notes:
+        for note in filtered_notes:
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
             st.markdown(f"**{note['timestamp']}** – {note['content']}")
             st.markdown("---")
     else:
         st.info("Nenhuma anotação encontrada.")
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # Página: Configurações
 # -----------------------------------------------------------------------------
 def page_settings():
@@ -291,6 +490,26 @@ def page_settings():
     bg_color = "#ffffff" if theme == "Claro" else "#1e1e1e"
     text_color = "#000000" if theme == "Claro" else "#ffffff"
 
+=======
+# Página de configurações
+# -----------------------------------------------------------------------------
+
+def page_settings():
+    st.header("⚙️ Configurações")
+    st.markdown("Nesta versão demonstrativa, algumas configurações dependem do tema padrão do Streamlit.")
+    theme = st.selectbox("Tema", ["Claro", "Escuro"])
+    font_size = st.slider("Tamanho da fonte (em px)", 14, 22, 16)
+
+    # aplicar tema e tamanho de fonte usando CSS injetado
+    # O tema claro/escuro não pode ser alterado dinamicamente em Streamlit sem recarregar a página,
+    # mas aplicamos estilos de cor de fundo e texto para simular.
+    if theme == "Claro":
+        bg_color = "#ffffff"
+        text_color = "#000000"
+    else:
+        bg_color = "#1e1e1e"
+        text_color = "#ffffff"
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
     st.markdown(
         f"""
         <style>
@@ -303,6 +522,7 @@ def page_settings():
         """,
         unsafe_allow_html=True,
     )
+<<<<<<< HEAD
     st.info("Para aplicar completamente, recarregue a página.")
 
 # -----------------------------------------------------------------------------
@@ -311,6 +531,19 @@ def page_settings():
 def main():
     st.set_page_config(page_title="Gestão Pessoal TDAH", page_icon="✅", layout="centered")
     menu = st.sidebar.radio("Menu", ("Tarefas", "Pomodoro", "Finanças", "Anotações", "Configurações"), index=0)
+=======
+    st.info("As alterações de tema podem exigir recarregar a página no navegador para aplicar completamente.")
+
+# -----------------------------------------------------------------------------
+# Função principal
+# -----------------------------------------------------------------------------
+
+def main():
+    st.set_page_config(page_title="Gestão Pessoal TDAH", page_icon="✅", layout="centered")
+    menu = st.sidebar.radio(
+        "Menu", ("Tarefas", "Pomodoro", "Finanças", "Anotações", "Configurações"), index=0
+    )
+>>>>>>> 5626db22c989f957899d2d1afff19d3c002ec738
 
     if menu == "Tarefas":
         page_tasks()
